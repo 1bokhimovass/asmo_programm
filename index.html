@@ -242,9 +242,22 @@
               ><div class="dept-icon fs-2">📜</div>
               <div>
                 <h5 class="fw-bold mb-0">Ombor tarixi</h5>
-                <small class="text-muted">Amallar arxivi</small>
-              </div></a
+                <small class="text-muted"></small></div
+            ></a>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <div
+              onclick="goToExpenses()"
+              class="dept-card"
+              style="border-left: 6px solid #ffc107"
             >
+              <div class="dept-icon fs-2">💰</div>
+              <div>
+                <h5 class="fw-bold mb-0">Xarajatlar</h5>
+                <small class="text-muted"></small>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -285,6 +298,15 @@
         localStorage.removeItem("selectedProduct");
         document.getElementById("subSection").classList.add("d-none");
         document.getElementById("productSection").classList.remove("d-none");
+      }
+
+      // XARAJATLARGA YO'NALTIRISH FUNKSIYASI
+      function goToExpenses() {
+        const type = localStorage.getItem("selectedProduct");
+        let dept = "LED_PCB";
+        if (type === "Gore") dept = "GORE_TEX";
+        if (type === "Switch") dept = "SWITCH_STOP";
+        window.location.href = "xarajatlar.html?dept=" + dept;
       }
 
       // 3. SAHIFA YUKLANGANDA
