@@ -1,27 +1,79 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="uz">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ombor Arxivi - ASMO AVTO</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="config.js"></script>
 
     <style>
-      body { background-color: #f4f7f6; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; }
-      .card { border-radius: 12px; border: none; overflow: hidden; }
-      .table thead th { background-color: #f8f9fa; font-size: 0.85rem; color: #666; text-align: center; }
-      .table tbody td { text-align: center; vertical-align: middle; }
-      .badge-custom { font-size: 0.9rem; padding: 5px 10px; }
-      .edit-btn { font-size: 0.75rem; padding: 2px 8px; border-radius: 6px; text-transform: uppercase; font-weight: 700; }
+      body {
+        background-color: #f4f7f6;
+        font-family: "Segoe UI", Tahoma, sans-serif;
+      }
+      .card {
+        border-radius: 12px;
+        border: none;
+        overflow: hidden;
+        margin-bottom: 25px;
+      }
+      .quarter-btn {
+        border-radius: 10px;
+        padding: 8px 15px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        transition: 0.3s;
+      }
+      .table thead th {
+        background-color: #f8f9fa;
+        font-size: 0.75rem;
+        color: #64748b;
+        text-transform: uppercase;
+        text-align: center;
+      }
+      .table tbody td {
+        text-align: center;
+        vertical-align: middle;
+        font-size: 0.85rem;
+        border-bottom: 1px solid #f1f5f9;
+      }
+
+      .active-q {
+        background-color: #0d6efd !important;
+        color: white !important;
+        box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
+      }
 
       @media (max-width: 768px) {
-        .table thead { display: none; }
-        .table tbody tr { display: block; margin-bottom: 20px; border: 1px solid #eee; border-radius: 10px; background: #fff; padding: 10px; }
-        .table tbody td { display: flex; justify-content: space-between; align-items: center; text-align: right; border-bottom: 1px dashed #f0f0f0; padding: 8px 5px; }
-        .table tbody td::before { content: attr(data-label); font-weight: bold; text-transform: uppercase; font-size: 0.75rem; color: #888; text-align: left; }
+        .table thead {
+          display: none;
+        }
+        .table tbody tr {
+          display: block;
+          margin-bottom: 15px;
+          border: 1px solid #eee;
+          border-radius: 10px;
+          background: #fff;
+          padding: 10px;
+        }
+        .table tbody td {
+          display: flex;
+          justify-content: space-between;
+          padding: 8px 5px;
+          border-bottom: 1px dashed #f0f0f0;
+        }
+        .table tbody td::before {
+          content: attr(data-label);
+          font-weight: bold;
+          color: #888;
+          font-size: 0.75rem;
+        }
       }
     </style>
   </head>
@@ -29,22 +81,65 @@
     <div class="container py-4">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold m-0 h4">📊 Ombor Arxivi</h2>
-        <a href="index.html" class="btn btn-dark shadow-sm px-4">orqaga</a>
+        <a href="index.html" class="btn btn-dark px-4 shadow-sm">orqaga</a>
       </div>
 
-      <div class="card mb-5 shadow-sm border-success">
-        <div class="card-header bg-success text-white fw-bold">📥 XOMASHYO KIRIM</div>
-        <div class="table-responsive p-2">
-          <table class="table table-hover">
+      <div class="card p-3 shadow-sm mb-4 border-0">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="text-muted small fw-bold text-uppercase"
+            >Chorakni tanlang:</span
+          >
+          <span
+            id="auto-msg"
+            class="badge bg-info text-dark"
+            style="font-size: 0.7rem"
+            >Avtomatik tanlandi</span
+          >
+        </div>
+        <div class="d-flex gap-2 flex-wrap" id="q-container">
+          <button
+            class="btn btn-outline-primary quarter-btn"
+            onclick="manualSelect(1)"
+            id="btn-q1"
+          >
+            1-Chorak (Yan-Mar)
+          </button>
+          <button
+            class="btn btn-outline-primary quarter-btn"
+            onclick="manualSelect(2)"
+            id="btn-q2"
+          >
+            2-Chorak (Apr-Iyun)
+          </button>
+          <button
+            class="btn btn-outline-primary quarter-btn"
+            onclick="manualSelect(3)"
+            id="btn-q3"
+          >
+            3-Chorak (Iyul-Sen)
+          </button>
+          <button
+            class="btn btn-outline-primary quarter-btn"
+            onclick="manualSelect(4)"
+            id="btn-q4"
+          >
+            4-Chorak (Okt-Dek)
+          </button>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-success text-white fw-bold py-3">
+          📥 XOMASHYO KIRIM
+        </div>
+        <div class="table-responsive p-0">
+          <table class="table table-hover mb-0">
             <thead>
               <tr>
                 <th>Sana</th>
                 <th>Mahsulot</th>
-                <th>Ta'minotchi</th>
                 <th>Partiya</th>
-                <th>Transport</th>
                 <th>Miqdor</th>
-                <th>Mas'ul</th>
                 <th>Amal</th>
               </tr>
             </thead>
@@ -53,45 +148,65 @@
         </div>
       </div>
 
-      <div class="card mb-5 shadow-sm border-danger">
-        <div class="card-header bg-danger text-white fw-bold">📤 XOMASHYO CHIQIM</div>
-        <div class="table-responsive p-2"><table class="table table-hover"><tbody id="table-chiqim"></tbody></table></div>
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-danger text-white fw-bold py-3">
+          📤 XOMASHYO CHIQIM
+        </div>
+        <div class="table-responsive p-0">
+          <table class="table table-hover mb-0">
+            <tbody id="table-chiqim"></tbody>
+          </table>
+        </div>
       </div>
-      <div class="card mb-5 shadow-sm border-primary">
-        <div class="card-header bg-primary text-white fw-bold">🏭 ISHLAB CHIQARILGAN</div>
-        <div class="table-responsive p-2"><table class="table table-hover"><tbody id="table-tayyor"></tbody></table></div>
-      </div>
-      <div class="card mb-5 shadow-sm border-warning">
-        <div class="card-header bg-warning text-dark fw-bold">💰 SOTUV (MIJOZLAR)</div>
-        <div class="table-responsive p-2"><table class="table table-hover"><tbody id="table-sotuv"></tbody></table></div>
+
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-primary text-white fw-bold py-3">
+          🏭 ISHLAB CHIQARILGAN
+        </div>
+        <div class="table-responsive p-0">
+          <table class="table table-hover mb-0">
+            <tbody id="table-tayyor"></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
     <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-sm">
-        <div class="modal-content shadow-lg" style="border-radius: 15px;">
+        <div
+          class="modal-content border-0 shadow-lg"
+          style="border-radius: 20px"
+        >
           <div class="modal-body p-4">
             <h6 class="fw-bold mb-3">Tahrirlash</h6>
             <input type="hidden" id="edit-id" />
-            
             <div class="mb-3">
               <label class="small text-muted mb-1">Sana va vaqt</label>
-              <input type="datetime-local" id="edit-time" class="form-control shadow-sm" />
+              <input
+                type="datetime-local"
+                id="edit-time"
+                class="form-control"
+              />
             </div>
-
             <div class="mb-3">
               <label class="small text-muted mb-1">Miqdor</label>
-              <input type="number" id="edit-qty" class="form-control shadow-sm" />
+              <input type="number" id="edit-qty" class="form-control" />
             </div>
-
             <div class="mb-3">
               <label class="small text-muted mb-1">Partiya</label>
-              <input type="text" id="edit-batch" class="form-control shadow-sm" />
+              <input type="text" id="edit-batch" class="form-control" />
             </div>
-
             <div class="d-grid gap-2 mt-4">
-              <button onclick="saveEdit()" class="btn btn-primary fw-bold" style="border-radius: 10px;">Saqlash</button>
-              <button class="btn btn-light text-muted" data-bs-dismiss="modal">Bekor qilish</button>
+              <button
+                onclick="saveEdit()"
+                class="btn btn-primary fw-bold"
+                style="border-radius: 12px"
+              >
+                Saqlash
+              </button>
+              <button class="btn btn-light text-muted" data-bs-dismiss="modal">
+                Bekor qilish
+              </button>
             </div>
           </div>
         </div>
@@ -100,59 +215,97 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-      db.ref("asmo_ombor_records").on("value", (snapshot) => {
-        const data = snapshot.val();
-        const tables = ["table-kirim", "table-chiqim", "table-tayyor", "table-sotuv"];
-        tables.forEach(id => document.getElementById(id).innerHTML = "");
+      let currentFilterQuarter = 1;
 
-        if (data) {
-          Object.keys(data).reverse().forEach((key) => {
-            const item = data[key];
-            let row = "";
+      // 1. AVTOMATIK ANIQLASH FUNKSIYASI
+      function autoDetectQuarter() {
+        const currentMonth = new Date().getMonth() + 1; // 1-12
+        const quarter = Math.ceil(currentMonth / 3);
+        currentFilterQuarter = quarter;
+        highlightButton(quarter);
+      }
 
-            if (item.type === "Xomashyo Kirim") {
-              row = `<tr>
-                <td data-label="Sana"><small>${item.time}</small></td>
-                <td data-label="Mahsulot"><b>${item.product}</b></td>
-                <td data-label="Ta'minotchi">${item.info || "-"}</td>
-                <td data-label="Partiya"><span class="badge bg-light text-dark border">${item.batch || "-"}</span></td>
-                <td data-label="Transport"><span class="text-primary">${item.transport || "-"}</span></td>
-                <td data-label="Miqdor"><span class="badge bg-success badge-custom">+${item.qty}</span></td>
-                <td data-label="Mas'ul"><small class="fw-bold">${item.responsible || "-"}</small></td>
-                <td data-label="Amal">
-                  <button class="btn btn-outline-secondary edit-btn" onclick="openEdit('${key}', '${item.qty}', '${item.batch || ""}', '${item.time}')">Edit</button>
-                </td>
-              </tr>`;
-              document.getElementById("table-kirim").innerHTML += row;
-            } else if (item.type === "Xomashyo Chiqim") {
-                row = `<tr><td data-label="Sana"><small>${item.time}</small></td><td data-label="Mahsulot"><b>${item.product}</b></td><td data-label="Sabab">${item.info || "-"}</td><td data-label="Miqdor"><span class="badge bg-danger">-${item.qty}</span></td><td data-label="Mas'ul">${item.responsible || "-"}</td></tr>`;
-                document.getElementById("table-chiqim").innerHTML += row;
-            } else if (item.type === "Tayyor Mahsulot") {
-                row = `<tr><td data-label="Sana"><small>${item.time}</small></td><td data-label="Mahsulot"><b>${item.product}</b></td><td data-label="Izoh">${item.info || "-"}</td><td data-label="Miqdor"><span class="badge bg-primary">${item.qty}</span></td><td data-label="Mas'ul">${item.responsible || "-"}</td></tr>`;
-                document.getElementById("table-tayyor").innerHTML += row;
-            } else if (item.type === "Sotuv") {
-                row = `<tr><td data-label="Sana"><small>${item.time}</small></td><td data-label="Mahsulot"><b>${item.product}</b></td><td data-label="Mijoz">${item.info || "-"}</td><td data-label="Miqdor"><span class="badge bg-warning text-dark">${item.qty}</span></td><td data-label="Mas'ul">${item.responsible || "-"}</td></tr>`;
-                document.getElementById("table-sotuv").innerHTML += row;
+      // 2. RUCHNOY TANLASH FUNKSIYASI
+      function manualSelect(q) {
+        currentFilterQuarter = q;
+        document.getElementById("auto-msg").innerText = "Qo'lda tanlandi";
+        document.getElementById("auto-msg").className =
+          "badge bg-warning text-dark";
+        highlightButton(q);
+        loadData();
+      }
+
+      function highlightButton(q) {
+        for (let i = 1; i <= 4; i++) {
+          document.getElementById("btn-q" + i).classList.remove("active-q");
+        }
+        document.getElementById("btn-q" + q).classList.add("active-q");
+      }
+
+      // 3. MA'LUMOTLARNI YUKLASH
+      function loadData() {
+        db.ref("asmo_ombor_records").on("value", (snapshot) => {
+          const data = snapshot.val();
+          const tables = ["table-kirim", "table-chiqim", "table-tayyor"];
+          tables.forEach((id) => (document.getElementById(id).innerHTML = ""));
+
+          if (data) {
+            Object.keys(data)
+              .reverse()
+              .forEach((key) => {
+                const item = data[key];
+
+                // Oyni aniqlash (12/02/2026 formatidan)
+                const month = parseInt(item.time.split("/")[1]);
+                const itemQuarter = Math.ceil(month / 3);
+
+                if (itemQuarter === currentFilterQuarter) {
+                  let row = "";
+                  if (item.type === "Xomashyo Kirim") {
+                    row = `<tr>
+                    <td data-label="Sana"><small>${item.time}</small></td>
+                    <td data-label="Mahsulot"><b>${item.product}</b></td>
+                    <td data-label="Partiya"><span class="badge bg-light text-dark border">${item.batch || "-"}</span></td>
+                    <td data-label="Miqdor"><span class="badge bg-success">+${item.qty}</span></td>
+                    <td data-label="Amal">
+                        <button class="btn btn-outline-secondary btn-sm" onclick="openEdit('${key}', '${item.qty}', '${item.batch}', '${item.time}')">EDIT</button>
+                    </td>
+                  </tr>`;
+                    document.getElementById("table-kirim").innerHTML += row;
+                  } else if (item.type === "Xomashyo Chiqim") {
+                    row = `<tr><td data-label="Sana">${item.time}</td><td data-label="Mahsulot">${item.product}</td><td data-label="Sabab">${item.info}</td><td data-label="Miqdor"><span class="badge bg-danger">-${item.qty}</span></td></tr>`;
+                    document.getElementById("table-chiqim").innerHTML += row;
+                  } else if (item.type === "Tayyor Mahsulot") {
+                    row = `<tr><td data-label="Sana">${item.time}</td><td data-label="Mahsulot">${item.product}</td><td data-label="Izoh">${item.info}</td><td data-label="Miqdor"><span class="badge bg-primary">${item.qty}</span></td></tr>`;
+                    document.getElementById("table-tayyor").innerHTML += row;
+                  }
+                }
+              });
+          }
+
+          // Bo'sh bo'lsa xabar
+          tables.forEach((id) => {
+            if (document.getElementById(id).innerHTML === "") {
+              document.getElementById(id).innerHTML =
+                "<tr><td colspan='5' class='py-4 text-muted'>Ma'lumot topilmadi</td></tr>";
             }
           });
-        }
-      });
+        });
+      }
 
+      // TAHRIRLASH FUNKSIYALARI
       function openEdit(id, qty, batch, time) {
         document.getElementById("edit-id").value = id;
         document.getElementById("edit-qty").value = qty;
         document.getElementById("edit-batch").value = batch;
-        
-        // Sanani datetime-local formatiga o'tkazish (Baza.html dagi kabi)
         try {
-          const parts = time.split(", "); // "12/02/2026, 14:30:00" -> ["12/02/2026", "14:30:00"]
-          const dParts = parts[0].split("/"); // ["12", "02", "2026"]
+          const parts = time.split(", ");
+          const dParts = parts[0].split("/");
           const formatted = `${dParts[2]}-${dParts[1]}-${dParts[0]}T${parts[1].substring(0, 5)}`;
           document.getElementById("edit-time").value = formatted;
         } catch (e) {
           document.getElementById("edit-time").value = "";
         }
-        
         new bootstrap.Modal(document.getElementById("editModal")).show();
       }
 
@@ -161,21 +314,26 @@
         const newTimeRaw = document.getElementById("edit-time").value;
         const qty = document.getElementById("edit-qty").value;
         const batch = document.getElementById("edit-batch").value;
-
-        if (!newTimeRaw || !qty) return alert("Barcha maydonlarni to'ldiring!");
-
+        if (!newTimeRaw || !qty) return alert("To'ldiring!");
         const d = new Date(newTimeRaw);
         const newTimeStr = d.toLocaleString("uz-UZ").replace(/\./g, "/");
-
-        db.ref("asmo_ombor_records/" + id).update({
-          time: newTimeStr,
-          qty: parseFloat(qty),
-          batch: batch,
-          timestamp: d.getTime()
-        }).then(() => {
-          bootstrap.Modal.getInstance(document.getElementById("editModal")).hide();
-        });
+        db.ref("asmo_ombor_records/" + id)
+          .update({
+            time: newTimeStr,
+            qty: parseFloat(qty),
+            batch: batch,
+            timestamp: d.getTime(),
+          })
+          .then(() => {
+            bootstrap.Modal.getInstance(
+              document.getElementById("editModal"),
+            ).hide();
+          });
       }
+
+      // ISHGA TUSHIRISH
+      autoDetectQuarter();
+      loadData();
     </script>
   </body>
 </html>
