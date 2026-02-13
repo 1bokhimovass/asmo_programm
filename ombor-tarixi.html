@@ -116,6 +116,7 @@
           </table>
         </div>
       </div>
+
       <div class="card mb-5 shadow-sm border-primary">
         <div class="card-header bg-primary text-white fw-bold">
           🏭 ISHLAB CHIQARILGAN
@@ -134,6 +135,7 @@
           </table>
         </div>
       </div>
+
       <div class="card mb-5 shadow-sm border-warning">
         <div class="card-header bg-warning text-dark fw-bold">
           💰 SOTUV (MIJOZLAR)
@@ -223,9 +225,7 @@
                 </td>
               </tr>`;
                 document.getElementById("table-kirim").innerHTML += row;
-              }
-              // Boshqa turlarni (chiqim, tayyor, sotuv) o'zingizni kodingizdagidek bu yerga qo'shib qo'ying...
-              else if (item.type === "Xomashyo Chiqim") {
+              } else if (item.type === "Xomashyo Chiqim") {
                 row = `<tr><td data-label="Sana">${item.time}</td><td data-label="Mahsulot">${item.product}</td><td data-label="Sabab">${item.info || "-"}</td><td data-label="Miqdor"><span class="badge bg-danger">-${item.qty}</span></td></tr>`;
                 document.getElementById("table-chiqim").innerHTML += row;
               } else if (item.type === "Tayyor Mahsulot") {
@@ -242,38 +242,54 @@
       function openEdit(id, qty, time) {
         document.getElementById("edit-id").value = id;
         document.getElementById("edit-qty").value = qty;
-
         try {
-          // "13/02/2026, 11:15:00" formatini "2026-02-13T11:15" formatiga o'tkazish
           const parts = time.split(", ");
           const d = parts[0].split("/");
           const formatted = `${d[2]}-${d[1]}-${d[0]}T${parts[1].substring(0, 5)}`;
           document.getElementById("edit-time").value = formatted;
         } catch (e) {
-          console.log("Sana xatosi");
+          console.log("Sana formati xatosi");
         }
-
         editModal.show();
       }
 
       function saveEdit() {
         const id = document.getElementById("edit-id").value;
-        const newQty = document.getElementById("edit-qty").value;
+        const newQty = parseFloat(document.getElementById("edit-qty").value);
         const newTimeRaw = document.getElementById("edit-time").value;
 
-        if (!newTimeRaw || !newQty) return alert("To'ldiring!");
+        if (!newTimeRaw || isNaN(newQty))
+          return alert("Ma'lumotlarni to'liq kiriting!");
 
-        const d = new Date(newTimeRaw);
-        const newTimeStr = d.toLocaleString("uz-UZ").replace(/\./g, "/");
+        // Jiddiy ishxonada tasdiqlash shart
+        if (!confirm("Haqiqatan ham ushbu ma'lumotni o'zgartirmoqchimisiz?"))
+          return;
 
+        // 1. Narxni hisobga olgan holda jami summani yangilash mantiqi
         db.ref("asmo_ombor_records/" + id)
-          .update({
-            qty: parseFloat(newQty),
-            time: newTimeStr,
-            timestamp: d.getTime(),
+          .once("value")
+          .then((snap) => {
+            const item = snap.val();
+            const price = item.price || 0;
+            const newTotalSum = newQty * price;
+
+            const d = new Date(newTimeRaw);
+            const newTimeStr = d.toLocaleString("uz-UZ").replace(/\./g, "/");
+
+            return db.ref("asmo_ombor_records/" + id).update({
+              qty: newQty,
+              time: newTimeStr,
+              timestamp: d.getTime(),
+              jami_summa: newTotalSum,
+              last_edit: new Date().toLocaleString(),
+            });
           })
           .then(() => {
+            alert("Muvaffaqiyatli yangilandi! ✅");
             editModal.hide();
+          })
+          .catch((err) => {
+            alert("Xatolik: " + err.message);
           });
       }
     </script>
